@@ -8,15 +8,56 @@ TODO:
 - Bonus: if at any point an error is returned, render the default gifs again.
 */
 
-import defaultGifs from '../gifs.json';
-import { getGifsBySearch, getTrendingGifs } from '../adapters/giphyAdapters';
+import { useState, useEffect } from "react";
+import GifSearch from "./GifSearch";
+import defaultGifs from "../gifs.json";
+import { getGifsBySearch, getTrendingGifs } from "../adapters/giphyAdapters";
 
 const GifContainer = () => {
-    return (
-        <ul>
+  const [gifs, setGifs] = useState(defaultGifs);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState("");
 
-        </ul>
-    )
-}
+  useEffect(() => {
+    const fetchTrending = async () => {
+      const [data, error] = await getTrendingGifs();
+      if (error) {
+        setError(error);
+        setGifs(defaultGifs);
+      } else {
+        setGifs(data);
+      }
+    };
+    fetchTrending();
+  }, []);
 
-export default GifContainer
+  useEffect(() => {
+    if (!search) return;
+
+    const fetchSearchResults = async () => {
+      const [data, error] = await getGifsBySearch(search);
+      if (error) {
+        setError(error);
+        setGifs(defaultGifs);
+      } else {
+        setGifs(data);
+      }
+    };
+    fetchSearchResults();
+  }, [search]);
+
+  return (
+    <div>
+      <GifSearch onSearch={setSearch} />
+      <ul>
+        {gifs.map((gif) => (
+          <li key={gif.id}>
+            <img src={gif.images.original.url} alt="gif" />
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default GifContainer;
