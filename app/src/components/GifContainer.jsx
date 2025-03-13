@@ -9,14 +9,12 @@ TODO:
 */
 
 import { useState, useEffect } from "react";
-import GifSearch from "./GifSearch";
 import defaultGifs from "../gifs.json";
 import { getGifsBySearch, getTrendingGifs } from "../adapters/giphyAdapters";
 
-const GifContainer = () => {
+const GifContainer = ({ search }) => {
   const [gifs, setGifs] = useState(defaultGifs);
   const [error, setError] = useState(null);
-  const [search, setSearch] = useState("");
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -48,7 +46,6 @@ const GifContainer = () => {
 
   return (
     <div>
-      <GifSearch onSearch={setSearch} />
       <ul>
         {gifs.map((gif) => (
           <li key={gif.id}>
